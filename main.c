@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -94,11 +95,26 @@ bool check(struct Sprite a, struct Sprite b)
     return 0;
 }
 
+void draw_score(SDL_Renderer *renderer, TTF_Font *font, int score)
+{
+    char score_text[20];
+    sprintf(score_text, "%d", score);
+    SDL_Color color = {255, 0, 0};
+    SDL_Surface *surface_score = TTF_RenderText_Solid(font, score_text, color);
+    SDL_Texture *score_texture = SDL_CreateTextureFromSurface(renderer, surface_score);
+    int texW, texH;
+    SDL_QueryTexture(score_texture, NULL, NULL, &texW, &texH);
+    SDL_Rect dstrect = {20, 20, texW, texH};
+    SDL_RenderCopy(renderer, score_texture, NULL, &dstrect);
+}
+
 int main(int argc, char **argv)
 {
     bool quit = false;
     SDL_Event event;
     SDL_Init(SDL_INIT_EVERYTHING);
+
+    TTF_Init();
     SDL_Window *screen = SDL_CreateWindow("demo",
                                           SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     SDL_SetWindowFullscreen(screen, 1);
@@ -118,6 +134,13 @@ int main(int argc, char **argv)
     for (size_t i = 0; i < 20; i++)
     {
         enemys[i] = make_sprite(renderer, 0, 0, 34, 44, 1, 1, "./assets/enemy.bmp");
+    }
+
+    int score = 0;
+    TTF_Font *font = TTF_OpenFont("./assets/font.ttf", 40);
+    if (!font)
+    {
+        printf("Font_Load: %s\n", TTF_GetError());
     }
 
     while (!quit)
@@ -247,16 +270,22 @@ int main(int argc, char **argv)
         {
             for (size_t j = 0; j < 20; j++)
             {
-                if (check(enemys[i], fires[j]))
+                if (enemys[i].die == 0 && fires[j].die == 0)
                 {
-                    enemys[i].die = 1;
-                    fires[j].die = 1;
+                    if (check(enemys[i], fires[j]))
+                    {
+                        enemys[i].die = 1;
+                        fires[j].die = 1;
+                        score += 1;
+                    }
                 }
             }
         }
 
         draw_sprite(renderer, hero);
         // draw_sprite(renderer, gameover);
+
+        draw_score(renderer, font, score);
 
         SDL_RenderPresent(renderer);
         // SDL_UpdateWindowSurface(screen);
@@ -270,5 +299,8 @@ int main(int argc, char **argv)
 
     IMG_Quit();
     SDL_Quit();
+
+    TTF_CloseFont(font);
+    TTF_Quit();
     return 0;
 }

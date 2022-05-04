@@ -1,1 +1,1 @@
-gcc main.c -lSDL2 -lSDL2main -lSDL2_image -o app
+gcc main.c -lSDL2 -lSDL2main -lSDL2_image -lSDL2_ttf -o app
