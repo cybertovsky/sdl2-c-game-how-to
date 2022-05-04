@@ -86,7 +86,7 @@ bool check(struct Sprite a, struct Sprite b)
 {
     if (abs(a.x - b.x) < a.w)
     {
-        if (abs(a.y - b.y) > a.h)
+        if (abs(a.y - b.y) < a.h)
         {
             return 1;
         }
