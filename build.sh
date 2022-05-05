@@ -1,1 +1,1 @@
-gcc main.c -lSDL2 -lSDL2main -lSDL2_image -lSDL2_ttf -o app
+gcc ./src/lib/draw.c ./src/lib/sprite.c ./src/main.c -lSDL2 -lSDL2main -lSDL2_image -lSDL2_ttf -o ./build/app
